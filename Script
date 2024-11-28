@@ -1,0 +1,263 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+-- -----------------------------------------------------
+-- Schema hitoai
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema hitoai
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `hitoai` DEFAULT CHARACTER SET utf8 ;
+USE `hitoai` ;
+
+-- -----------------------------------------------------
+-- Table `hitoai`.`evaluacion`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `hitoai`.`evaluacion` (
+  `ID_Evaluacion` INT(11) NOT NULL AUTO_INCREMENT,
+  `Nombre` VARCHAR(255) NULL DEFAULT NULL,
+  `Tipo` VARCHAR(255) NULL DEFAULT NULL,
+  `N_Instancia` INT(11) NULL DEFAULT NULL,
+  `Fecha` DATE NULL DEFAULT NULL,
+  PRIMARY KEY (`ID_Evaluacion`))
+ENGINE = InnoDB
+AUTO_INCREMENT = 3
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `hitoai`.`facultad`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `hitoai`.`facultad` (
+  `ID_Facultad` INT(11) NOT NULL AUTO_INCREMENT,
+  `Nombre` VARCHAR(255) NULL DEFAULT NULL,
+  PRIMARY KEY (`ID_Facultad`))
+ENGINE = InnoDB
+AUTO_INCREMENT = 2
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `hitoai`.`carrera`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `hitoai`.`carrera` (
+  `ID_Carrera` INT(11) NOT NULL AUTO_INCREMENT,
+  `Nombre` VARCHAR(45) NULL DEFAULT NULL,
+  `Facultad_ID_Facultad` INT(11) NOT NULL,
+  PRIMARY KEY (`ID_Carrera`),
+  INDEX `fk_Carrera_Facultad_idx` (`Facultad_ID_Facultad` ASC) ,
+  CONSTRAINT `fk_Carrera_Facultad`
+    FOREIGN KEY (`Facultad_ID_Facultad`)
+    REFERENCES `hitoai`.`facultad` (`ID_Facultad`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+AUTO_INCREMENT = 2
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `hitoai`.`asignatura`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `hitoai`.`asignatura` (
+  `ID_Asignatura` INT(11) NOT NULL AUTO_INCREMENT,
+  `Nombre` VARCHAR(45) NULL DEFAULT NULL,
+  `Semestre` INT(11) NULL DEFAULT NULL,
+  `N_Hito` INT(11) NULL DEFAULT NULL,
+  `Plan_Academico` INT(11) NULL DEFAULT NULL,
+  `Carrera_ID_Carrera` INT(11) NOT NULL,
+  PRIMARY KEY (`ID_Asignatura`),
+  INDEX `fk_Asignatura_Carrera1_idx` (`Carrera_ID_Carrera` ASC) ,
+  CONSTRAINT `fk_Asignatura_Carrera1`
+    FOREIGN KEY (`Carrera_ID_Carrera`)
+    REFERENCES `hitoai`.`carrera` (`ID_Carrera`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+AUTO_INCREMENT = 4
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `hitoai`.`contenido`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `hitoai`.`contenido` (
+  `ID_Contenido` INT(11) NOT NULL AUTO_INCREMENT,
+  `Nucleo_Tematico` VARCHAR(255) NULL DEFAULT NULL,
+  `Horas` INT(11) NULL DEFAULT NULL,
+  `Asignatura_ID_Asignatura` INT(11) NOT NULL,
+  PRIMARY KEY (`ID_Contenido`),
+  INDEX `fk_Contenido_Asignatura1_idx` (`Asignatura_ID_Asignatura` ASC) ,
+  CONSTRAINT `fk_Contenido_Asignatura1`
+    FOREIGN KEY (`Asignatura_ID_Asignatura`)
+    REFERENCES `hitoai`.`asignatura` (`ID_Asignatura`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+AUTO_INCREMENT = 20
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `hitoai`.`competencia`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `hitoai`.`competencia` (
+  `ID_Competencia` INT(11) NOT NULL AUTO_INCREMENT,
+  `Nombre` VARCHAR(255) NULL DEFAULT NULL,
+  `Tipo` VARCHAR(255) NULL DEFAULT NULL,
+  PRIMARY KEY (`ID_Competencia`))
+ENGINE = InnoDB
+AUTO_INCREMENT = 6
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `hitoai`.`ra`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `hitoai`.`ra` (
+  `ID_RA` INT(11) NOT NULL AUTO_INCREMENT,
+  `Nombre` VARCHAR(255) NULL DEFAULT NULL,
+  `Competencia_ID_Competencia` INT(11) NOT NULL,
+  PRIMARY KEY (`ID_RA`),
+  INDEX `fk_RA_Competencia1_idx` (`Competencia_ID_Competencia` ASC) ,
+  CONSTRAINT `fk_RA_Competencia1`
+    FOREIGN KEY (`Competencia_ID_Competencia`)
+    REFERENCES `hitoai`.`competencia` (`ID_Competencia`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+AUTO_INCREMENT = 8
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `hitoai`.`indicador`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `hitoai`.`indicador` (
+  `ID_Indicador` INT(11) NOT NULL AUTO_INCREMENT,
+  `Descripcion` VARCHAR(255) NULL DEFAULT NULL,
+  `Puntaje_Max` INT(11) NULL DEFAULT NULL,
+  `Contenido_ID_Contenido` INT(11) NOT NULL,
+  `RA_ID_RA` INT(11) NOT NULL,
+  PRIMARY KEY (`ID_Indicador`),
+  INDEX `fk_Indicador_Contenido1_idx` (`Contenido_ID_Contenido` ASC) ,
+  INDEX `fk_Indicador_RA1_idx` (`RA_ID_RA` ASC) ,
+  CONSTRAINT `fk_Indicador_Contenido1`
+    FOREIGN KEY (`Contenido_ID_Contenido`)
+    REFERENCES `hitoai`.`contenido` (`ID_Contenido`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Indicador_RA1`
+    FOREIGN KEY (`RA_ID_RA`)
+    REFERENCES `hitoai`.`ra` (`ID_RA`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+AUTO_INCREMENT = 19
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `hitoai`.`estudiante`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `hitoai`.`estudiante` (
+  `ID_Estudiante` VARCHAR(10) NOT NULL,
+  `Nombre` VARCHAR(45) NULL DEFAULT NULL,
+  `Apellido` VARCHAR(45) NULL DEFAULT NULL,
+  `Anio_Ingreso` INT(11) NULL DEFAULT NULL,
+  PRIMARY KEY (`ID_Estudiante`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `hitoai`.`inscripcion`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `hitoai`.`inscripcion` (
+  `ID_Inscripcion` INT(11) NOT NULL AUTO_INCREMENT,
+  `Anio` INT(11) NULL DEFAULT NULL,
+  `Semestre` INT(11) NULL DEFAULT NULL,
+  `Asignatura_ID_Asignatura` INT(11) NOT NULL,
+  `Estudiante_ID_Estudiante` VARCHAR(10) NOT NULL,
+  PRIMARY KEY (`ID_Inscripcion`),
+  INDEX `fk_Inscripcion_Asignatura1_idx` (`Asignatura_ID_Asignatura` ASC) ,
+  INDEX `fk_Inscripcion_Estudiante1_idx` (`Estudiante_ID_Estudiante` ASC) ,
+  CONSTRAINT `fk_Inscripcion_Asignatura1`
+    FOREIGN KEY (`Asignatura_ID_Asignatura`)
+    REFERENCES `hitoai`.`asignatura` (`ID_Asignatura`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Inscripcion_Estudiante1`
+    FOREIGN KEY (`Estudiante_ID_Estudiante`)
+    REFERENCES `hitoai`.`estudiante` (`ID_Estudiante`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+AUTO_INCREMENT = 2
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `hitoai`.`aplicacion`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `hitoai`.`aplicacion` (
+  `ID_Aplicacion` INT(11) NOT NULL AUTO_INCREMENT,
+  `Obtenido` INT(11) NULL DEFAULT NULL,
+  `Evaluacion_ID_Evaluacion` INT(11) NOT NULL,
+  `Indicador_ID_Indicador` INT(11) NOT NULL,
+  `Inscripcion_ID_Inscripcion` INT(11) NOT NULL,
+  PRIMARY KEY (`ID_Aplicacion`),
+  INDEX `fk_Aplicacion_Evaluacion1_idx` (`Evaluacion_ID_Evaluacion` ASC) ,
+  INDEX `fk_Aplicacion_Indicador1_idx` (`Indicador_ID_Indicador` ASC) ,
+  INDEX `fk_Aplicacion_Inscripcion1_idx` (`Inscripcion_ID_Inscripcion` ASC) ,
+  CONSTRAINT `fk_Aplicacion_Evaluacion1`
+    FOREIGN KEY (`Evaluacion_ID_Evaluacion`)
+    REFERENCES `hitoai`.`evaluacion` (`ID_Evaluacion`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Aplicacion_Indicador1`
+    FOREIGN KEY (`Indicador_ID_Indicador`)
+    REFERENCES `hitoai`.`indicador` (`ID_Indicador`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Aplicacion_Inscripcion1`
+    FOREIGN KEY (`Inscripcion_ID_Inscripcion`)
+    REFERENCES `hitoai`.`inscripcion` (`ID_Inscripcion`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+AUTO_INCREMENT = 13
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `hitoai`.`criterio`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `hitoai`.`criterio` (
+  `ID_Criterio` INT(11) NOT NULL AUTO_INCREMENT,
+  `Nombre` VARCHAR(255) NULL DEFAULT NULL,
+  `R_Min` INT(11) NULL DEFAULT NULL,
+  `R_Max` INT(11) NULL DEFAULT NULL,
+  `Indicador_ID_Indicador` INT(11) NOT NULL,
+  PRIMARY KEY (`ID_Criterio`),
+  INDEX `fk_Criterio_Indicador1_idx` (`Indicador_ID_Indicador` ASC) ,
+  CONSTRAINT `fk_Criterio_Indicador1`
+    FOREIGN KEY (`Indicador_ID_Indicador`)
+    REFERENCES `hitoai`.`indicador` (`ID_Indicador`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+AUTO_INCREMENT = 4
+DEFAULT CHARACTER SET = utf8;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
